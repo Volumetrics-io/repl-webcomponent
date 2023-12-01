@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US" prefix="og: http://ogp.me/ns#">
+
+<head>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width, initial-scale=1">
+  <title>Web REPL</title>
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <script type=module>
+  const html = document.querySelector('#html')
+  const css = document.querySelector('#css')
+  const js = document.querySelector('#js')
+  const iframe = document.querySelector('iframe')
+
+  window.addEventListener('load', event => {
+    if (location.search) {
+      const params = new URLSearchParams(location.search)
+      const markup = decode(params.get('html'))
+        .replace(/&lt;/g,'<')
+        .replace(/&gt;/g,'>')
+        .replace(/&amp;/g,'&')
+      const styles = decode(params.get('css'))
+      const scripts = decode(params.get('js'))
+
+      html.value = markup
+      css.value = styles
+      js.value = scripts
+    } else {
+      html.value = localStorage.html ?? `<mr-app>
+  <mr-surface>
+    <mr-container>
+      <mr-column>
+        <mr-text>Hello World!</mr-text>
+        <mr-img src="placeholder.jpg"></mr-img>
+      </mr-column>
+    </mr-container>
+  </mr-surface>
+</mr-app>`;
+      css.value = localStorage.css ?? ''
+      js.value = localStorage.js ?? ''
+    }
+
+    autoHeight(html)
+    autoHeight(css)
+    autoHeight(js)
+
+    return preview()
+  })
+
+  ;[html, css, js].forEach(tag =>
+    tag.addEventListener('input', event => {
+      localStorage[tag.id] = tag.value
+      autoHeight(tag)
+
+      return preview()
+    })
+
+  )
+
+  function preview() {
+    share.href = `?html=${encode(html.value)}&css=${encode(css.value)}&js=${encode(js.value)}`
+
+    iframe.srcdoc = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>untitled project</title>
+    <script src="https://cdn.jsdelivr.net/gh/volumetrics-io/mrjs@latest/dist/mr.js"><\/script>
+  </head>
+<body>
+      ${html.value}
+      <script type="module">${js.value}<\/script>
+      <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: none;
+            border-collapse: collapse;
+        }
+
+        html {
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+
+        body {
+            position: fixed;
+        }
+
+        mr-app, mr-surface, mr-container {
+            height: 400px;
+            width: 600px;
+        }
+
+        mr-app * {
+            display: block;
+        }
+
+        ${css.value}
+        
+        <\/style>
+    <\/body>
+<\/html>
+    `
+  }
+
+  function encode(string) {
+    return btoa(escape(encodeURIComponent(string)))
+  }
+
+  function decode(string) {
+    return decodeURIComponent(unescape(atob(string)))
+  }
+
+  function autoHeight(tag) {
+    tag.style.height = 'auto'
+
+    return tag.style.height = getComputedStyle(tag).getPropertyValue('borderTop')
+      + getComputedStyle(tag).getPropertyValue('paddingTop')
+      + tag.scrollHeight
+      + getComputedStyle(tag).getPropertyValue('paddingBottom')
+      + getComputedStyle(tag).getPropertyValue('borderBottom')
+      + 'px'
+  }
+</script>
+</head>
+
+<body>
+  <aside>
+    <textarea id="html" accesskey="h" placeholder="HTML" autocapitalize="off" autocorrect="off"></textarea>
+    <textarea id="css" accesskey="c" placeholder="CSS" autocapitalize="off" autocorrect="off"></textarea>
+    <textarea id="js" accesskey="j" placeholder="JavaScript" autocapitalize="off" autocorrect="off"></textarea>
+  </aside>
+  <main>
+    <iframe></iframe>
+    <a id="share" href="#" target="_blank">Share</a>
+  </main>
+</body>
