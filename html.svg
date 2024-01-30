@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
-  <defs>
-    <bx:grid x="0" y="0" width="1" height="1"/>
-  </defs>
-  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 4 10.02 L 1 6 L 4 2"/>
-  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 8 10.02 L 11 6 L 8 2"/>
-</svg>

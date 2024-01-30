@@ -2,12 +2,28 @@ class Repl extends HTMLElement {
     constructor() {
         super();
 
+        const height = this.getAttribute('height') ? parseInt(this.getAttribute('height'), 10) : 300;
+
         const htmlSlot = this.querySelector('[slot="html"]');
         const cssSlot = this.querySelector('[slot="css"]');
         const jsSlot = this.querySelector('[slot="javascript"]');
 
-        this.htmlContent = htmlSlot ? this.reindent(htmlSlot.innerHTML) : `<h1>Hello</h1>`;
-        this.cssContent = cssSlot ? this.reindent(cssSlot.innerHTML) : `h1 { color: red; }`;
+        this.htmlContent = htmlSlot ? this.reindent(htmlSlot.innerHTML) : this.reindent(`
+        <div class="frame">
+            <h1>Hello</h1>
+        </div>
+        `);
+        this.cssContent = cssSlot ? this.reindent(cssSlot.innerHTML) : this.reindent(`
+        .frame {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        h1 { color: rebeccaPurple; }`);
         this.jsContent = jsSlot ? this.reindent(jsSlot.innerHTML) : ``;
 
         this.attachShadow({ mode: 'open' });
@@ -16,19 +32,50 @@ class Repl extends HTMLElement {
                 display: block;
                 padding: 0;
                 margin: 0;
-                border: 1px solid var(--border);
                 border-radius: 16px;
                 overflow: hidden;
+            }
+
+            :root {
+                --paper: white;
+                --track: #f8f8f8;
+                --ink: #242424;
+                --faded: #666;
+            
+                --accent: hsl(260, 100%, 75%);
+                --accent-text: hsl(260, 84%, 40%);
+                --center: hsl(230, 100%, 70%);
+                --alt-accent: hsl(200, 70%, 65%);
+                --alt-accent-text: hsl(200, 100%, 30%);
+            
+                --border: #00000011;
+            }
+            
+            @media (prefers-color-scheme:dark) {
+                :root {
+                    --paper: #141414;
+                    --track: #000;
+                    --ink: #f8f8f8;
+                    --faded: #888888;
+            
+                    --accent: hsl(245, 100%, 75%);
+                    --accent-text: hsl(245, 100%, 80%);
+                    --center: hsl(268, 100%, 75%);
+                    --alt-accent: hsl(290, 100%, 75%);
+                    --alt-accent-text: hsl(290, 100%, 80%);
+            
+                    --border: #FFFFFF22;
+                }
             }
 
             .repl {
                 position: relative;
                 margin: 0;
                 display: grid;
-                grid-template-columns: 50% 50%;
+                grid-template-columns: 60% 40%;
                 width: 100%;
-                height: 300px;
-                
+                height: ${height}px;
+                background-color: var(--track);
             }
 
             nav {
@@ -36,11 +83,11 @@ class Repl extends HTMLElement {
                 flex-flow: row nowrap;
                 position: absolute;
                 bottom: 1rem;
-                left: 50%;
+                left: 60%;
                 transform: translate(calc(-100% - 1rem), 0%);
-                background-color: black;
                 z-index: 99;
                 border-radius: 6px;
+                border: 1px solid var(--border);
                 overflow: hidden;
             }
 
@@ -57,53 +104,69 @@ class Repl extends HTMLElement {
             }
 
             .tabs {
-                background: black;
-                color: white;
-                padding: .5em;
-                font-size: 0.85rem;
+                background-color: var(--paper);
+                color: var(--ink);
+                padding: .5rem .75rem;
+                font-size: 12px;
+                font-weight: 700;
                 line-height: 1;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 text-decoration: none;
                 border: none;
+                gap: 6px;
             }
 
             .tabs:hover,
             .tabs:focus {
                 color: black;
-                background-color: #a07aff;
+                background-color: var(--alt-accent);
             }
 
             .tabs.selected {
                 color: black;
-                background-color: #e982ff;
+                background-color: var(--accent);
             }
 
             .wrapper {
                 position: relative;
-                height: 300px;
+                height: ${height}px;
             }
 
-            .ace_editor, .ace_editor *{
+            .ace_editor, .ace_gutter {
+                background-color: var(--track) !important;
+            }
+
+            .ace_gutter-cell {
+                color: var(--faded) !important;
+                font-size: 12px !important;
+            }
+
+            .ace_editor {
                 font-family: monospace !important;
-                font-size: 15px !important;
+                font-size: 14px !important;
                 font-weight: 400 !important;
                 letter-spacing: 0 !important;
                 line-height: 150%;
             }
 
+            .ace_gutter-active-line {
+                background: none !important;
+            }            
+
             iframe {
                 width: 100%;
-                height: 300px;
+                height: ${height}px;
                 border: none;
+                border-left: 1px solid var(--border);
             }
 
             @media only screen and (max-width: 600px) {
                 .repl {
                     grid-template-columns: 1fr;
                     grid-template-rows: 50% 50%;
-                    height: 600px;
+                    height: ${Math.round(height * 2)}px;
                 }
             
                 nav {
@@ -111,6 +174,12 @@ class Repl extends HTMLElement {
                     left: 50%;
                     flex-flow: row nowrap;
                     transform: translate(-50%, 0%);
+                }
+
+                iframe {
+                    border-left: unset;
+                    border-bottom: 1px solid var(--border);
+                    z-index: 9;
                 }
 
                 #render {
@@ -128,25 +197,30 @@ class Repl extends HTMLElement {
                 </aside>
                 <iframe id="render"></iframe>
                 <nav>
-                    <button class="tabs" id="button_html">
-                        <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                            <path style="stroke: currentColor; fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 4 10.02 L 1 6 L 4 2"></path>
-                            <path style="stroke: currentColor; fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 8 10.02 L 11 6 L 8 2"></path>
-                        </svg>&nbsp;HTML</button>
-                    <button class="tabs" id="button_css"># CSS</button>
-                    <button class="tabs" id="button_js">{} JS</button>
+                    <button class="tabs" id="button_html">HTML</button>
+                    <button class="tabs" id="button_css">CSS</button>
+                    <button class="tabs" id="button_js">JS</button>
                 </nav>
-                <div class="refresh">
+                <!-- <div class="refresh">
                     <button class="tabs" id="button_refresh">Refresh</button>
-                </div>
-            </div>`;
+                </div> -->
+            </div>
+            
+            <!-- load ace -->
+            <script src="/ace/ace.js"></script>
+            <!-- load ace language tools -->
+            <script src="/ace/ext-language_tools.js"></script>
+            `;
     }
 
     connectedCallback(script = document.createElement("script")) {
 
-        // script.src = `https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js`;
-        script.src = `/ace/ace.js`;
+        script.src = `https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js`;
+        // script.src = `/ace/ace.js`;
         script.onload = () => {
+
+            // ace.config.set("basePath", "ace/");
+            // ace.require("ace/ext/language_tools");
 
             this.editors = [
                 {
@@ -170,11 +244,14 @@ class Repl extends HTMLElement {
 
                 mode.editor = ace.edit(this.shadowRoot.getElementById(mode.id), {
                     mode: `ace/mode/${mode.id}`,
-                    // theme: "ace/theme/dracula",
                     value: mode.value,
                     autoScrollEditorIntoView: true,
                     showGutter: true,
-                    highlightActiveLine: false
+                    highlightActiveLine: false,
+                    useWorker: true,
+                    enableBasicAutocompletion: true,
+                    enableSnippets: true,
+                    enableLiveAutocompletion: true
                 });
 
                 // Mandatory when running inside a shadowDom (for positioning)
@@ -196,9 +273,9 @@ class Repl extends HTMLElement {
                 })
             })
 
-            this.shadowRoot.querySelector("#button_refresh").addEventListener("click", () => {
-                this.render();
-            })
+            // this.shadowRoot.querySelector("#button_refresh").addEventListener("click", () => {
+            //     this.render();
+            // })
 
             // Add listener for changes in the color scheme
             this.themeListener = window.matchMedia('(prefers-color-scheme: dark)');
@@ -278,10 +355,10 @@ class Repl extends HTMLElement {
         this.editors.forEach(mode => {
             if (scheme === 'dark') {
                 mode.editor.setTheme("ace/theme/dracula"); // Example dark theme
-                mode.editor.container.style.background="#282a36";
+                mode.editor.container.style.background = "#282a36";
             } else {
                 mode.editor.setTheme("ace/theme/chrome"); // Example light theme
-                mode.editor.container.style.background="#f8f8f8";
+                mode.editor.container.style.background = "#f8f8f8";
             }
         })
     }
