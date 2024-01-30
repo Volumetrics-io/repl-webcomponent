@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US" prefix="og: http://ogp.me/ns#">
+
+<head>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width, initial-scale=1">
+  <title>Web REPL</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.63.1/lib/codemirror.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/markdown/markdown.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/xml/xml.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/css/css.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/javascript/javascript.min.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.63.1/lib/codemirror.min.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/material.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/nord.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/juejin.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/base16-light.min.css" />
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+
+  <script type=module src="script.js"></script>
+</head>
+
+<body>
+  <nav>
+      <button id="button_html">HTML</button>
+      <button id="button_css">CSS</button>
+      <button id="button_js">JS</button>
+      <a href="https://docs.mrjs.io" target="_blank">Docs</a>
+      <a href="https://github.com/Volumetrics-io/MR.js/issues" target="_blank">Issues</a>
+      <button id="share" onclick="share()">Share</button>
+  </nav>
+  <aside>
+    <div id="html">
+      <textarea id="html-textarea"></textarea>
+    </div>
+    <div id="css">
+      <textarea id="css-textarea"></textarea>
+    </div>
+    <div id="js">
+      <textarea id="js-textarea"></textarea>
+    </div>
+  </aside>
+  <iframe id="render"></iframe>
+</body>

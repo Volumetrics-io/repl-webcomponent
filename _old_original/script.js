@@ -9,7 +9,7 @@ const App = {
                 htmlMode: true,
                 theme: "base16-light",
                 lineNumbers: true,
-                lineWrapping: true,
+                lineWrapping: false,
             }),
             button: document.querySelector("#button_html")
         },
@@ -19,7 +19,7 @@ const App = {
                 mode: "css",
                 theme: "base16-light",
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: false
             }),
             button: document.querySelector("#button_css")
         },
@@ -29,56 +29,52 @@ const App = {
                 mode: "javascript",
                 theme: "base16-light",
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: false
             }),
             button: document.querySelector("#button_js")
         }
     ],
     content: {
         html: localStorage.html ?? `<mr-app>
-  <mr-surface>
-    <mr-container>
-      <mr-row>
-        <mr-column>
-          <mr-text>OH LOOK IT'S BLUE</mr-text>
-        </mr-column>
-      </mr-row>
-    </mr-container>
-  </mr-surface>
+    <mr-panel>
+        <mr-text>An clickable image</mr-text>
+        <mr-a href="https://docs.mrjs.io">
+            <mr-img src="assets/humpback.jpg"
+                    alt="A Humpback whale breaking the water">
+                </mr-img>
+        </mr-a>
+    </mr-panel>
 </mr-app>`,
-        css: localStorage.css ?? `mr-text {
-    color: red;
-    font-size: 100px;
+        css: localStorage.css ?? `mr-panel {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    padding: 10vw;
+    gap: 10px;
+    width: 100vw;
+    height: 100vh;
+}
+
+mr-img {
+    max-width: 320px;
+    border-radius: 50px;
+}
+
+mr-img.hover {
+    border-radius: 30px;
 }`,
-        js: localStorage.js ?? `console.log("hello!")`,
+        js: localStorage.js ?? "",
     }
 }
 
-// const App = new Proxy(state, {
-//     set: function (target, key, value) {
-//         console.log(`${key} set to ${value}`);
-//         target[key] = value;
-//         render();
-//         return true;
-//     }
-// });
-
 window.addEventListener('load', event => {
-    const params = location.search ? new URLSearchParams(location.search) : null;
+    // const params = location.search ? new URLSearchParams(location.search) : null;
 
     // For each editor (html, css, and javascript)
     App.editors.forEach(mode => {
-        let value;
 
-        // If url parameters are present
-        // (a url generated from the share button)
-        if(params && params.get(mode.id)) {
-            value = decode(params.get(mode.id))
-        } else {
-            value = App.content[mode.id]
-        }
-        
-        mode.editor.setValue(value);
+        mode.editor.setValue(App.content[mode.id]);
 
         // Hide all the editors by default
         document.getElementById(mode.id).style.display = "none";
@@ -87,7 +83,6 @@ window.addEventListener('load', event => {
         // and the render view is updated
         mode.editor.on('change', () => {
             localStorage[mode.id] = mode.editor.getValue();
-            // App.content[mode.id] = mode.editor.getValue();
             render();
         })
 
@@ -117,66 +112,21 @@ function selectEditor() {
 }
 
 function render() {
-    const htmlvalue = App.editors[0].editor.getValue();
-    const cssvalue = App.editors[1].editor.getValue();
-    const jsvalue = App.editors[2].editor.getValue();
-
-    document.querySelector("#share").onclick = () => {
-        let urlparams = `?html=${encode(htmlvalue)}&css=${encode(cssvalue)}&js=${encode(jsvalue)}`
-        // location.assign(urlparams);
-        window.open(urlparams, '_blank');
-    }
-
     App.render.srcdoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>untitled project</title>
-  <script src="https://cdn.jsdelivr.net/gh/volumetrics-io/mrjs@latest/dist/mr.js"><\/script>
+  <script src="https://cdn.jsdelivr.net/npm/mrjs@latest/dist/mr.js"><\/script>
 </head>
 <body>
-    ${htmlvalue}
-    <script type="module">${jsvalue}<\/script>
+    ${App.editors[0].editor.getValue()}
+    <script type="module">${App.editors[2].editor.getValue()}<\/script>
     <style>
-      * {
-          padding: 0;
-          margin: 0;
-          border: none;
-          border-collapse: collapse;
-      }
-
-      html {
-          overflow: hidden;
-          overscroll-behavior: none;
-      }
-
-      body {
-          position: fixed;
-      }
-
-      mr-container {
-          height: 100vh;
-          width: 100%;
-      }
-
-      mr-app * {
-          display: block;
-      }
-
-      ${cssvalue}
-      
+      ${App.editors[1].editor.getValue()}
       <\/style>
   <\/body>
 <\/html>
   `
 }
-
-function encode(string) {
-    return btoa(escape(encodeURIComponent(string)))
-}
-
-function decode(string) {
-    return decodeURIComponent(unescape(atob(string)))
-}
-

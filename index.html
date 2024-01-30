@@ -2,47 +2,156 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US" prefix="og: http://ogp.me/ns#">
 
 <head>
-  <meta charset=utf-8>
-  <meta name=viewport content="width=device-width, initial-scale=1">
-  <title>Web REPL</title>
+    <meta charset=utf-8>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <title>Web REPL component</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.63.1/lib/codemirror.min.js"></script>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/markdown/markdown.min.js"></script> -->
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/xml/xml.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/css/css.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/mode/javascript/javascript.min.js"></script>
+    <script type="module" src="inline-repl.js"></script>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.63.1/lib/codemirror.min.css" />
+    <style>
+        /* Light theme */
+        :root {
+            --paper: white;
+            --track: #f8f8f8;
+            --ink: #242424;
+            --faded: #666;
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/material.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/nord.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/juejin.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.3/theme/base16-light.min.css" />
+            --border: #00000011;
 
-  <link rel="stylesheet" type="text/css" href="style.css" />
+            --accent: hsl(260, 100%, 75%);
+            --accent-text: hsl(260, 84%, 40%);
+            --center: hsl(230, 100%, 70%);
+            --alt-accent: hsl(200, 70%, 65%);
+            --alt-accent-text: hsl(200, 100%, 30%);
+        }
 
-  <script type=module src="script.js"></script>
+        @media (prefers-color-scheme:dark) {
+            :root {
+                --paper: #141414;
+                --track: #000;
+                --ink: #f8f8f8;
+                --faded: #888888;
+
+                --border: #FFFFFF22;
+
+                --accent: hsl(245, 100%, 75%);
+                --accent-text: hsl(245, 100%, 80%);
+                --center: hsl(268, 100%, 75%);
+                --alt-accent: hsl(290, 100%, 75%);
+                --alt-accent-text: hsl(290, 100%, 80%);
+            }
+        }
+
+        html,
+        body {
+            padding: 0;
+            margin: 0;
+            border: none;
+            box-sizing: inherit;
+        }
+
+        body {
+            background-color: var(--paper);
+            color: var(--ink);
+            width: 90vw;
+            padding: 5vw;
+        }
+    </style>
 </head>
 
 <body>
-  <nav>
-      <button id="button_html">HTML</button>
-      <button id="button_css">CSS</button>
-      <button id="button_js">JS</button>
-      <a href="https://docs.mrjs.io" target="_blank">Docs</a>
-      <a href="https://github.com/Volumetrics-io/MR.js/issues" target="_blank">Issues</a>
-      <button id="share" onclick="share()">Share</button>
-  </nav>
-  <aside>
-    <div id="html">
-      <textarea id="html-textarea"></textarea>
-    </div>
-    <div id="css">
-      <textarea id="css-textarea"></textarea>
-    </div>
-    <div id="js">
-      <textarea id="js-textarea"></textarea>
-    </div>
-  </aside>
-  <iframe id="render"></iframe>
+    <h1>REPL WebComponent</h1>
+    <p>Adipiscing quis id dolore cursus tortor magna lorem est pharetra.</p>
+    <inline-repl>
+        <code slot="html">
+            <mr-app debug="true">
+                <mr-panel>
+                    <mr-text>This is not a link</mr-text>
+                    <mr-a href="https://mrjs.io/">This is a link</mr-a>
+                    <mr-a class="big-link" href="https://volumetrics.io/">This is a big purple link</mr-a>
+                </mr-panel>
+            </mr-app>
+        </code>
+
+        <style slot="css">
+            mr-panel {
+                display: flex;
+                flex-flow: column nowrap;
+                align-items: center;
+                justify-content: center;
+                padding: 10vw;
+                gap: 10px;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            .big-link {
+                font-size: 150%;
+                color: rebeccaPurple;
+            }
+        </style>
+    </inline-repl>
+
+    <h1>mr-app</h1>
+    <p>Adipiscing quis id dolore cursus tortor magna lorem est pharetra.</p>
+
+    <inline-repl>
+        <code slot="html">
+            <mr-app debug="true">
+                <!-- Lighting the scene -->
+                <mr-light color="white" intensity="3" data-position="0 0.1 0.25"></mr-light>
+
+                <!-- The 2D UI Panel -->
+                <mr-panel>
+                    <mr-text class="title">Hello world!</mr-text>
+                    <mr-text>This is an mr-app</mr-text>
+            
+                    <!--wrap non-UI components in mr-div to anchor to UI-->
+                    <mr-div style="width: 200px; height: 200px; z-index: 70;">
+                        <mr-model id="logo" src="https://assets.codepen.io/686746/volumetrics.stl" style="scale: 0.0025;"></mr-model>
+                    </mr-div>
+                </mr-panel>
+            </mr-app>
+        </code>
+
+        <style slot="css">
+            mr-panel {
+                display: flex;
+                flex-flow: column nowrap;
+                align-items: center;
+                justify-content: center;
+                width: 100vw;
+                height: 100vh;
+                font-family: Helvetica;
+            }
+
+            mr-text {
+                letter-spacing: 1px;
+                line-height: 120%;
+                width: 200px;
+            }
+
+            .title {
+                font-size: 150%;
+                font-weight: bold;
+            }
+        </style>
+
+        <script slot="javascript">
+            let t = 0;
+
+            window.requestAnimationFrame(function rotate() {
+                t += 0.004;
+                let rx = -Math.cos(t) * 45;
+                let ry = Math.cos(t) * 90;
+                let rz = Math.cos(t) * 180;
+                document.querySelector("#logo").dataset.rotation = `${rx} ${ry} ${rz}`;
+                window.requestAnimationFrame(rotate);
+            });
+        </script>
+    </inline-repl>
+
+    <h1>Empty component</h1>
+    <inline-repl></inline-repl>
+
 </body>
