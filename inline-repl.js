@@ -128,9 +128,13 @@ class Repl extends HTMLElement {
                 </aside>
                 <iframe id="render"></iframe>
                 <nav>
-                    <button class="tabs" id="button_html">HTML</button>
-                    <button class="tabs" id="button_css">CSS</button>
-                    <button class="tabs" id="button_js">JS</button>
+                    <button class="tabs" id="button_html">
+                        <svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                            <path style="stroke: currentColor; fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 4 10.02 L 1 6 L 4 2"></path>
+                            <path style="stroke: currentColor; fill: none; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round;" d="M 8 10.02 L 11 6 L 8 2"></path>
+                        </svg>&nbsp;HTML</button>
+                    <button class="tabs" id="button_css"># CSS</button>
+                    <button class="tabs" id="button_js">{} JS</button>
                 </nav>
                 <div class="refresh">
                     <button class="tabs" id="button_refresh">Refresh</button>
